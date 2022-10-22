@@ -114,7 +114,7 @@ technique11 SpriteTech {
 
             _compiledFX = ToDispose(ShaderBytecode.Compile(SpriteFX, "SpriteTech", "fx_5_0"));
             {
-                
+
                 if (_compiledFX.HasErrors)
                     return false;
 
@@ -172,7 +172,7 @@ technique11 SpriteTech {
                         OptionFlags = ResourceOptionFlags.None,
                         StructureByteStride = 0
                     };
-                    
+
                     _IB = ToDispose(new SharpDX.Direct3D11.Buffer(_device, _indexBuffer.DangerousGetHandle(), ibd));
 
                     BlendStateDescription transparentDesc = new BlendStateDescription()
@@ -233,7 +233,7 @@ technique11 SpriteTech {
             {
                 _deviceContext.OutputMerger.SetBlendState(_transparentBS, blendFactor);
 
-                BeginBatch(F.GetFontSheetSRV());
+                var tex = BeginBatch(F.GetFontSheetSRV());
 
 
                 int length = text.Length;
@@ -269,10 +269,11 @@ technique11 SpriteTech {
 
                 EndBatch();
                 _deviceContext.OutputMerger.SetBlendState(backupBlendState, backupBlendFactor, backupMask);
+                tex.Dispose();
             }
         }
 
-        public void BeginBatch(ShaderResourceView texSRV)
+        public Texture2D BeginBatch(ShaderResourceView texSRV)
         {
             Debug.Assert(_initialized);
 
@@ -286,6 +287,7 @@ technique11 SpriteTech {
                 _texHeight = texDesc.Height;
             }
             _spriteList.Clear();
+            return tex;
         }
 
         public void EndBatch()
